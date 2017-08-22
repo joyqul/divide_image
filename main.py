@@ -55,13 +55,29 @@ class Image:
                 newFilename = self.get_saved_name(i, j)
                 cropedImage.save(newFilename, savedFileFormat)
 
-if __name__ == "__main__":
-    import os, sys
-    folder = sys.argv[1]
-    dest = sys.argv[2]
-    targets = os.listdir(folder)
+
+def do_slice(options):
+    import os
+    fromDir = options.folder[0]
+    toDir = options.folder[1]
+    row = options.row
+    col = options.col
+    targets = os.listdir(fromDir)
     for filename in targets:
-        fullFilename = '%s%s' %(folder, filename)
+        fullFilename = os.path.join(fromDir, filename)
         print 'slice %s' %( fullFilename )
-        tmp = Image(fullFilename, rows=1, dest=dest)
+        tmp = Image(fullFilename, rows=row, columns=col, dest=toDir)
         tmp.slice()
+    
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Divide image into pieces')
+    parser.add_argument('folder', nargs=2,\
+                        help='Divide images in fore folder and save to back folder')
+    parser.add_argument('--row', type=int, default=1,\
+                        help='Divide images into given rows')
+    parser.add_argument('--col', type=int, default=1,\
+                        help='Divide images into given columns')
+    options = parser.parse_args()
+    do_slice(options)
