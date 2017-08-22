@@ -1,23 +1,34 @@
-saveDirectory = 'Desktop/'
-fileName = 'Desktop/tmpfile.jpg'
 savedFileFormat = 'jpeg'
 
 class Image:
-    def __init__(self, filename, columns=1, rows=1, ext='jpg'):
+    def __init__(self, filename, dest=None, columns=1, rows=1, ext='jpg'):
         self.filename = filename
+        self.dest = dest or self.get_dest()
         self.columns = columns
         self.rows = rows
         self.ext = ext
-        self.save_basename()
+        self.basename = self.get_basename()
 
-    def save_basename(self):
+    def get_dest(self):
         import os
-        self.basename = os.path.splitext(os.path.basename(filename))[0]
+        dest = os.path.dirname(self.filename)
+        return dest
+
+    def get_basename(self):
+        import os
+        basename = os.path.splitext(os.path.basename(self.filename))[0]
+        return basename
 
     def get_size_after_slice(self, originSize, pieces):
         newSize = originSize//pieces
         redundant = originSize-newSize*pieces
         return newSize, redundant
+
+    def get_saved_name(self, i, j):
+        filename = '%s_%s_%s.%s' %(self.basename, i, j, self.ext)
+        import os
+        return os.path.join(self.dest, filename)
+        
 
     def slice(self):
         from PIL import Image
@@ -41,10 +52,16 @@ class Image:
                 endY = startY+newHeight-1
                 area = (startX, startY, endX, endY)
                 cropedImage = imageData.crop(area)
-                newFilename = '%s_%s_%s.%s' %(self.basename, i, j, self.ext)
+                newFilename = self.get_saved_name(i, j)
                 cropedImage.save(newFilename, savedFileFormat)
 
-testImages = ['tmpfile.jpg', 'tmpfile2.jpg']
-for filename in testImages:
-    tmp = Image(filename, rows=2)
-    tmp.slice()
+if __name__ == "__main__":
+    import os, sys
+    folder = sys.argv[1]
+    dest = sys.argv[2]
+    targets = os.listdir(folder)
+    for filename in targets:
+        fullFilename = '%s%s' %(folder, filename)
+        print 'slice %s' %( fullFilename )
+        tmp = Image(fullFilename, rows=1, dest=dest)
+        tmp.slice()
