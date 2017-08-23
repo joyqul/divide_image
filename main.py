@@ -25,7 +25,7 @@ class Image:
         return newSize, redundant
 
     def get_saved_name(self, i, j):
-        filename = '%s_%s_%s.%s' %(self.basename, i, j, self.ext)
+        filename = 'slice_%s_{:02d}_{:02d}.%s'.format(i,j) %(self.basename, self.ext)
         import os
         return os.path.join(self.dest, filename)
         
