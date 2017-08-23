@@ -58,8 +58,8 @@ class Image:
 
 def do_slice(options):
     import os
-    fromDir = options.folder[0]
-    toDir = options.folder[1]
+    fromDir = options.folder
+    toDir = options.dest or fromDir
     row = options.row
     col = options.col
     targets = os.listdir(fromDir)
@@ -73,11 +73,13 @@ def do_slice(options):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Divide image into pieces')
-    parser.add_argument('folder', nargs=2,\
-                        help='Divide images in fore folder and save to back folder')
+    parser.add_argument('folder', type=str,\
+                        help='Divide images in folder into pieces')
     parser.add_argument('--row', type=int, default=1,\
                         help='Divide images into given rows')
     parser.add_argument('--col', type=int, default=1,\
                         help='Divide images into given columns')
+    parser.add_argument('--dest', type=str, \
+                        help='Save destination of divided images, default will save in same folder')
     options = parser.parse_args()
     do_slice(options)
