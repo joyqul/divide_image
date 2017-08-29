@@ -1,4 +1,17 @@
+import main as DivideImage
 import Tkinter as tk
+
+class Options:
+    folder = None
+    dest = None
+    row = None
+    col = None
+    def __init__(self, folder=None, dest=None, row=1, col=1):
+        self.folder = folder
+        self.dest = dest
+        self.row = row
+        self.col = col
+
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -33,11 +46,30 @@ class Application(tk.Frame):
         self.toDirBtn['state'] = 'disabled' if newValue else 'normal'
 
 
+    def _lock_ensure(self):
+        self.sliceStatus.configure(text='slicing...')
+        self.update()
+        self.ensure['state'] = 'disabled'
+
+
+    def _unlock_ensure(self, message='Done!'):
+        self.sliceStatus.configure(text=message)
+        self.ensure['state'] = 'normal'
+
+
     def _slice(self):
+        self._lock_ensure()
         fromDir = self.fromDir.cget('text')
         toDir = self.toDir.cget('text')
-        sliceInto = self.sliceIntoTextInput.get()
-        print fromDir, toDir, sliceInto
+        try:
+            sliceInto = int(self.sliceIntoTextInput.get())
+        except:
+            self._unlock_ensure(message="please enter slice into value")
+            return
+        options = Options(folder=fromDir, dest=toDir, row=sliceInto)
+        errMsgs = DivideImage.do_slice(options)
+        newText = '\n'.join(errMsgs) if len(errMsgs) else 'Done!'
+        self._unlock_ensure(message=newText)
 
 
     def createWidgets(self):
@@ -78,6 +110,9 @@ class Application(tk.Frame):
         self.ensure['text'] = 'ok'
         self.ensure['command'] = self._slice
         self.ensure.grid(row=4, column=0)
+
+        self.sliceStatus = tk.Label(self, text="")
+        self.sliceStatus.grid(row=5, column=0)
 
 if __name__ == "__main__":
     window = tk.Tk()
