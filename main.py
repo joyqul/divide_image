@@ -57,18 +57,25 @@ class Image:
 
 
 def do_slice(options):
-    import os
+    import os, sys
     fromDir = options.folder
     toDir = options.dest or fromDir
     row = options.row
     col = options.col
     targets = os.listdir(fromDir)
+    errMsgs = []
     for filename in targets:
-        fullFilename = os.path.join(fromDir, filename)
-        print 'slice %s' %( fullFilename )
-        tmp = Image(fullFilename, rows=row, columns=col, dest=toDir)
-        tmp.slice()
+        try:
+            fullFilename = os.path.join(fromDir, filename)
+            print 'slice %s' %( fullFilename )
+            tmp = Image(fullFilename, rows=row, columns=col, dest=toDir)
+            tmp.slice()
+            errMsgs.append('[Success] Slice %s' % (fullFilename))
+        except Exception as e:
+            print e
+            errMsgs.append('[Failed] %s' % (str(e)))
     
+    return errMsgs
 
 if __name__ == "__main__":
     import argparse
