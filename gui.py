@@ -28,10 +28,16 @@ class Application(tk.Frame):
     
     def _setToDirSameAsFromDir(self):
         newValue = not self.toDirSameAsFromDir
-        print newValue
         self.toDirSameAsFromDir = newValue
         ## Disable toDirBtn when set same as fromDir
         self.toDirBtn['state'] = 'disabled' if newValue else 'normal'
+
+
+    def _slice(self):
+        fromDir = self.fromDir.cget('text')
+        toDir = self.toDir.cget('text')
+        sliceInto = self.sliceIntoTextInput.get()
+        print fromDir, toDir, sliceInto
 
 
     def createWidgets(self):
@@ -62,6 +68,16 @@ class Application(tk.Frame):
         self.toDirSameAsFromDirBtn.select()
         self.toDirSameAsFromDirBtn.grid(row=2, column=0)
 
+        self.sliceInto = tk.Label(self, text='horizon slice into')
+        self.sliceInto.grid(row=3, column=0)
+
+        self.sliceIntoTextInput = tk.Entry(self)
+        self.sliceIntoTextInput.grid(row=3, column=1)
+
+        self.ensure = tk.Button(self)
+        self.ensure['text'] = 'ok'
+        self.ensure['command'] = self._slice
+        self.ensure.grid(row=4, column=0)
 
 if __name__ == "__main__":
     window = tk.Tk()
