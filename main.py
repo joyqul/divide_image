@@ -53,7 +53,7 @@ class Image:
                 area = (startX, startY, endX, endY)
                 cropedImage = imageData.crop(area)
                 newFilename = self.get_saved_name(i, j)
-                cropedImage.save(newFilename, savedFileFormat)
+                cropedImage.save(newFilename, format=savedFileFormat, subsampling=0, quality=100)
 
 
 def do_slice(options):
