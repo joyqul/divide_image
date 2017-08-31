@@ -48,8 +48,8 @@ class Image:
             for j in xrange(0, self.rows):
                 startX = newWidth*i
                 startY = newHeight*j
-                endX = startX+newWidth-1
-                endY = startY+newHeight-1
+                endX = startX+newWidth
+                endY = startY+newHeight
                 area = (startX, startY, endX, endY)
                 cropedImage = imageData.crop(area)
                 newFilename = self.get_saved_name(i, j)
