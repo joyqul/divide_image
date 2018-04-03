@@ -28,7 +28,18 @@ class Image:
         filename = 'slice_%s_{:02d}_{:02d}.%s'.format(i,j) %(self.basename, self.ext)
         import os
         return os.path.join(self.dest, filename)
-        
+
+    ### Square only
+    def resize(self, sizes):
+        import os
+        from PIL import Image
+        for size in sizes:
+            size = int(size)
+            imageData = Image.open(self.filename)
+            thumbnailSize = (size, size)
+            imageData.thumbnail(thumbnailSize, Image.ANTIALIAS)
+            newFilename = os.path.join(self.dest, "%s.png" %(size))
+            imageData.save(newFilename, format="PNG")
 
     def slice(self):
         from PIL import Image
@@ -77,6 +88,28 @@ def do_slice(options):
     
     return errMsgs
 
+
+## Square only
+def do_resize(options):
+    import os, sys
+    fromDir = options.folder
+    toDir = options.dest or fromDir
+    targets = os.listdir(fromDir)
+    errMsgs = []
+    for filename in targets:
+        try:
+            fullFilename = os.path.join(fromDir, filename)
+            print 'resize %s' %( fullFilename )
+            tmp = Image(fullFilename, rows=1, columns=1, dest=toDir)
+            tmp.resize(options.resize)
+            errMsgs.append('[Success] Slice %s' % (fullFilename))
+        except Exception as e:
+            print e
+            errMsgs.append('[Failed] %s' % (str(e)))
+    
+    return errMsgs
+
+
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Divide image into pieces')
@@ -86,7 +119,12 @@ if __name__ == "__main__":
                         help='Divide images into given rows')
     parser.add_argument('--col', type=int, default=1,\
                         help='Divide images into given columns')
-    parser.add_argument('--dest', type=str, \
+    parser.add_argument('--dest', type=str,\
                         help='Save destination of divided images, default will save in same folder')
+    parser.add_argument('--resize', nargs='+',\
+                        help='Resize image for given args')
     options = parser.parse_args()
-    do_slice(options)
+    if options.resize:
+        do_resize(options)
+    else:
+        do_slice(options)
