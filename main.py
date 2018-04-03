@@ -128,3 +128,8 @@ if __name__ == "__main__":
         do_resize(options)
     else:
         do_slice(options)
+
+# iOS App Icon sizes
+# 1024 120 152 167 180 20 29 40 58 60 76 87 80
+# Android App Icon sizes
+# 72 48 96 144 192
