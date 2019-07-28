@@ -1,11 +1,13 @@
 savedFileFormat = 'jpeg'
 
 class Image:
-    def __init__(self, filename, dest=None, columns=1, rows=1, ext='jpg'):
+    def __init__(self, filename, dest=None, columns=1, rows=1, ext='jpg', crop_width=None, shrink_width=None):
         self.filename = filename
         self.dest = dest or self.get_dest()
         self.columns = columns
         self.rows = rows
+        self.crop_width = crop_width
+        self.shrink_width = shrink_width
         self.ext = ext
         self.basename = self.get_basename()
 
@@ -45,6 +47,21 @@ class Image:
         from PIL import Image
         imageData = Image.open(self.filename)
         imageWidth, imageHeight = imageData.size
+
+        # Do crop
+        if self.crop_width and self.crop_width<imageWidth:
+            redundant = (imageWidth-self.crop_width)//2
+            box = (redundant, 0, imageWidth-redundant, imageHeight)
+            imageData = imageData.crop(box)
+            imageWidth, imageHeight = imageData.size
+
+        # Do resize in width
+        if self.shrink_width and self.shrink_width<imageWidth:
+            newHeight = int(1.0*imageHeight/imageWidth*self.shrink_width)
+            box = (self.shrink_width, newHeight)
+            print box
+            imageData = imageData.resize(box, Image.ANTIALIAS)
+            imageWidth, imageHeight = imageData.size
     
         newWidth, widthRedundant = self.get_size_after_slice(imageWidth, self.columns)
         newHeight, heightRedundant = self.get_size_after_slice(imageHeight, self.rows)
@@ -73,13 +90,16 @@ def do_slice(options):
     toDir = options.dest or fromDir
     row = options.row
     col = options.col
+    crop_width = options.crop_width
+    shrink_width = options.shrink_width
     targets = os.listdir(fromDir)
     errMsgs = []
     for filename in targets:
         try:
             fullFilename = os.path.join(fromDir, filename)
             print 'slice %s' %( fullFilename )
-            tmp = Image(fullFilename, rows=row, columns=col, dest=toDir)
+            tmp = Image(fullFilename, rows=row, columns=col, dest=toDir,\
+                    crop_width=crop_width, shrink_width=shrink_width)
             tmp.slice()
             errMsgs.append('[Success] Slice %s' % (fullFilename))
         except Exception as e:
@@ -123,6 +143,10 @@ if __name__ == "__main__":
                         help='Save destination of divided images, default will save in same folder')
     parser.add_argument('--resize', nargs='+',\
                         help='Resize image for given args')
+    parser.add_argument('--crop_width', type=int, default=0,\
+                        help='crop image with width')
+    parser.add_argument('--shrink_width', type=int, default=0,\
+                        help='shrink image with width')
     options = parser.parse_args()
     if options.resize:
         do_resize(options)
