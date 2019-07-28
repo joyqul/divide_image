@@ -59,7 +59,6 @@ class Image:
         if self.shrink_width and self.shrink_width<imageWidth:
             newHeight = int(1.0*imageHeight/imageWidth*self.shrink_width)
             box = (self.shrink_width, newHeight)
-            print box
             imageData = imageData.resize(box, Image.ANTIALIAS)
             imageWidth, imageHeight = imageData.size
     
