@@ -1,7 +1,7 @@
 savedFileFormat = 'jpeg'
 
 class Image:
-    def __init__(self, filename, dest=None, columns=1, rows=1, ext='jpg', crop_width=None, shrink_width=None):
+    def __init__(self, filename, dest=None, columns=1, rows=1, ext='png', crop_width=None, shrink_width=None):
         self.filename = filename
         self.dest = dest or self.get_dest()
         self.columns = columns
@@ -67,12 +67,12 @@ class Image:
 
         #TODO: figure out how to deal if has redundant
         if widthRedundant:
-            print 'Has redundant %s in width' %( widthRedundant )
+            print('Has redundant %s in width' %( widthRedundant ))
         if heightRedundant:
-            print 'Has redundant %s in height' %( heightRedundant )
+            print('Has redundant %s in height' %( heightRedundant ))
     
-        for i in xrange(0, self.columns):
-            for j in xrange(0, self.rows):
+        for i in range(0, self.columns):
+            for j in range(0, self.rows):
                 startX = newWidth*i
                 startY = newHeight*j
                 endX = startX+newWidth
@@ -96,13 +96,13 @@ def do_slice(options):
     for filename in targets:
         try:
             fullFilename = os.path.join(fromDir, filename)
-            print 'slice %s' %( fullFilename )
+            print('slice %s' %( fullFilename ))
             tmp = Image(fullFilename, rows=row, columns=col, dest=toDir,\
                     crop_width=crop_width, shrink_width=shrink_width)
             tmp.slice()
             errMsgs.append('[Success] Slice %s' % (fullFilename))
         except Exception as e:
-            print e
+            print(e)
             errMsgs.append('[Failed] %s' % (str(e)))
     
     return errMsgs
@@ -118,12 +118,12 @@ def do_resize(options):
     for filename in targets:
         try:
             fullFilename = os.path.join(fromDir, filename)
-            print 'resize %s' %( fullFilename )
+            print('resize %s' %( fullFilename ))
             tmp = Image(fullFilename, rows=1, columns=1, dest=toDir)
             tmp.resize(options.resize)
             errMsgs.append('[Success] Slice %s' % (fullFilename))
         except Exception as e:
-            print e
+            print(e)
             errMsgs.append('[Failed] %s' % (str(e)))
     
     return errMsgs
